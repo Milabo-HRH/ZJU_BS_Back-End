@@ -46,7 +46,7 @@ func Register(c *gin.Context) {
 		Name:      name,
 		Mail:      Mail,
 		Password:  string(hasePassword),
-		Privilege: "01",
+		Privilege: "normal",
 	}
 	db.Create(&newUser)
 
