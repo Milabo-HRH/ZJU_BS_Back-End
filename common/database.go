@@ -1,7 +1,7 @@
 package common
 
 import (
-	"awesomeProject/model"
+	"ZJU_BS_Back-End/model"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
@@ -23,7 +23,7 @@ func InitDB() *gorm.DB {
 	if err != nil {
 		panic("failed to connect database, err: " + err.Error())
 	}
-	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.User{}, &model.Task{}, &model.Picture{})
 	DB = db
 	return db
 }

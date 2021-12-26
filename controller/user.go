@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"awesomeProject/Util"
-	"awesomeProject/common"
-	"awesomeProject/dto"
-	"awesomeProject/model"
-	"awesomeProject/response"
+	"ZJU_BS_Back-End/common"
+	"ZJU_BS_Back-End/dto"
+	"ZJU_BS_Back-End/model"
+	"ZJU_BS_Back-End/response"
+	"ZJU_BS_Back-End/util"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
@@ -23,7 +23,7 @@ func Register(c *gin.Context) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "该邮箱已存在")
 		return
 	}
-	if !Util.VerifyEmailFormat(Mail) {
+	if !util.VerifyEmailFormat(Mail) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "请输入有效邮箱地址")
 		return
 	}
@@ -33,7 +33,7 @@ func Register(c *gin.Context) {
 	}
 	//没有给名称随机取名
 	if len(name) == 0 {
-		name = Util.RandomString(10)
+		name = util.RandomString(10)
 	}
 	hasePassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -59,16 +59,6 @@ func Register(c *gin.Context) {
 	response.Success(c, gin.H{"token": token}, "注册成功")
 }
 
-func isEmailExist(db *gorm.DB, Mail string) bool {
-	var user model.User
-	db.Where("Mail = ?", Mail).First(&user)
-	if user.ID != 0 {
-		return true
-	}
-
-	return false
-}
-
 func Login(c *gin.Context) {
 	db := common.GetDB()
 	//获取数据
@@ -84,7 +74,7 @@ func Login(c *gin.Context) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "该邮箱不存在")
 		return
 	}
-	if !Util.VerifyEmailFormat(Mail) {
+	if !util.VerifyEmailFormat(Mail) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "请输入有效邮箱地址")
 		return
 	}
@@ -116,7 +106,19 @@ func Login(c *gin.Context) {
 	}
 
 	//返回结果
-	response.Success(c, gin.H{"token": token}, "登录成功")
+	response.Success(c, gin.H{
+		"username": user.Name,
+		"token":    token,
+	}, "登录成功")
+}
+
+func isEmailExist(db *gorm.DB, Mail string) bool {
+	var user model.User
+	db.Where("Mail = ?", Mail).First(&user)
+	if user.ID != 0 {
+		return true
+	}
+	return false
 }
 
 func Info(ctx *gin.Context) {

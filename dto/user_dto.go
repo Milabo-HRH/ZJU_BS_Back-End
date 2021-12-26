@@ -1,6 +1,6 @@
 package dto
 
-import "awesomeProject/model"
+import "ZJU_BS_Back-End/model"
 
 type UserDto struct {
 	Name      string `json:"Name"`

@@ -4,5 +4,5 @@ dataSource:
   host: localhost
   database: Data_Annotation
   username: root
-  password: 110611
+  password: root
   charset: utf8

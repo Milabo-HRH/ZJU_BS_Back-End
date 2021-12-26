@@ -1,7 +1,7 @@
 package common
 
 import (
-	"awesomeProject/model"
+	"ZJU_BS_Back-End/model"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )

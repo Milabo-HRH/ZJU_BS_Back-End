@@ -1,8 +1,8 @@
 package main
 
 import (
-	"awesomeProject/common"
-	"awesomeProject/routers"
+	"ZJU_BS_Back-End/common"
+	"ZJU_BS_Back-End/routers"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"os"
@@ -15,7 +15,7 @@ func main() {
 
 	r := gin.Default()
 	r = routers.CollectRoute(r)
-	panic(r.Run())
+	panic(r.Run("0.0.0.0:8080"))
 }
 
 func InitConfig() {
