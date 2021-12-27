@@ -21,7 +21,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/annotations", middleware.AuthPrivilege("guest"), controller.GetAnnotations)
 	r.POST("/tasks/publish", middleware.AuthMiddleware, middleware.AuthPrivilege("normal"), controller.PublishTask)
 	r.POST("/annotations/publish", middleware.AuthMiddleware, middleware.AuthPrivilege("normal"), controller.PublishAnnotation)
-	r.POST("/annotations/review", middleware.AuthMiddleware, middleware.AuthPrivilege("important"), controller.ReviewAnnotation)
-	r.DELETE("/tasks", middleware.AuthMiddleware, middleware.AuthPrivilege("normal"), controller.DeleteTask)
+	r.POST("/annotations/review", middleware.AuthMiddleware, middleware.AuthPrivilege("important"), controller.PassAnnotation)
+	r.DELETE("/tasks", middleware.AuthMiddleware, middleware.AuthPrivilege("normal"), controller.DeleteAnnotation)
 	return r
 }

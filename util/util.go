@@ -24,3 +24,28 @@ func VerifyEmailFormat(email string) bool {
 	reg := regexp.MustCompile(pattern)
 	return reg.MatchString(email)
 }
+
+func VerifyUploaderID(ID int) bool {
+	return true
+	//todo: check if the ID is inside the DB and if the ID inside the token
+}
+
+func VerifyPictureID(ID int) bool {
+	return true
+	//todo: check if the picture is inside the DB
+}
+
+func VerifyReviewerID(ID int) bool {
+	return true
+	//todo: check if the reviewer is users with high privilege
+}
+
+func VerifyAssignmentID(ID int) bool {
+	return true
+	//todo: check if the assignmentID is in the DB
+}
+
+func VerifyAnnotationID(ID int) bool {
+	return true
+	//todo: check if the annotationID is in the DB
+}

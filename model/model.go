@@ -12,17 +12,19 @@ type User struct {
 	Privilege string `gorm:"type:varchar(10);not null"`
 }
 
-type Picture struct {
+type Assignment struct {
 	gorm.Model
 	UploaderID int    `gorm:"type:int unsigned;notnull"`
 	FileName   string `gorm:"type:varchar(40);notnull"`
+	Annotated  bool   `gorm:"type:bool"`
+	Reviewed   bool   `gorm:"type:bool"`
+	Tags       string `gorm:"type:varchar(40);"`
 }
 
-type Task struct {
+type Annotation struct {
 	gorm.Model
-	TaskName     string `gorm:"type:varchar(40);notnull"`
-	PublisherID  int    `gorm:"type:int unsigned;notnull"`
-	PictureID    int    `gorm:"type:int unsigned;notnull"`
+	UploaderID   int    `gorm:"type:int unsigned;notnull"`
+	AssignmentID int    `gorm:"type:int unsigned;notnull"`
 	Tags         string `gorm:"type:varchar(40);"`
 	Reviewed     bool   `gorm:"type:bool"`
 	ReviewUserID int    `gorm:"type:int unsigned;notnull"`
