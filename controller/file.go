@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"ZJU_BS_Back-End/model"
 	"ZJU_BS_Back-End/response"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -8,13 +9,14 @@ import (
 )
 
 func FileUpload(c *gin.Context) {
-	username, exist := c.Get("username")
+	user, exist := c.Get("user")
 	if !exist {
 		response.Response(c, http.StatusUnauthorized, 401, nil, "user not found")
 		return
 	}
+	username := user.(model.User).Name
 	file, err := c.FormFile("file")
-	filename := username.(string) + "_" + c.PostForm("name")
+	filename := username + "_" + c.PostForm("name")
 	if err != nil {
 		response.Response(c, http.StatusBadRequest, 400, nil, "upload failed")
 		return
@@ -43,5 +45,5 @@ func FileUpload(c *gin.Context) {
 
 func GetPicture(c *gin.Context) {
 	filename := c.Param("filename")
-	c.File("tmp/" + filename)
+	c.File("pics/" + filename)
 }

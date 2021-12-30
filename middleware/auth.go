@@ -6,18 +6,19 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strings"
 )
+
+type form struct {
+	Authorization string
+}
 
 func AuthMiddleware(ctx *gin.Context) {
 
 	// 获取 authorization header
 	tokenString := ctx.GetHeader("Authorization")
-
-	fmt.Print("请求token", tokenString)
-
+	fmt.Println("请求token", tokenString)
 	//validate token format
-	if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
+	if tokenString == "" {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"code": 401,
 			"msg":  "权限不足",
@@ -25,9 +26,7 @@ func AuthMiddleware(ctx *gin.Context) {
 		ctx.Abort()
 		return
 	}
-
-	tokenString = tokenString[7:] //截取字符
-
+	tokenString = tokenString[7:]
 	token, claims, err := common.ParseToken(tokenString)
 
 	if err != nil || !token.Valid {
@@ -57,7 +56,6 @@ func AuthMiddleware(ctx *gin.Context) {
 
 	//用户存在 将user信息写入上下文
 	ctx.Set("user", user)
-
 	ctx.Next()
 
 }

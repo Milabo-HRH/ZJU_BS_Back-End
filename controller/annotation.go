@@ -181,8 +181,8 @@ func PassAnnotation(c *gin.Context) {
 	//	return
 	//}
 	assignment := model.Assignment{}
-	annotaton := model.Annotation{}
-	if err := db.Model(&model.Annotation{}).Where("id = ?", AnnotationID.(int)).Take(&annotaton).Error; err != nil {
+	annotation := model.Annotation{}
+	if err := db.Model(&model.Annotation{}).Where("id = ?", AnnotationID.(int)).Take(&annotation).Error; err != nil {
 		response.Response(c, http.StatusUnprocessableEntity, 500, nil, "查询失败")
 		return
 	}
@@ -191,11 +191,11 @@ func PassAnnotation(c *gin.Context) {
 		return
 	}
 	assignment.Reviewed = true
-	assignment.Tags = annotaton.Tags
-	annotaton.Reviewed = true
-	annotaton.ReviewUserID = ReviewUserID.(int)
+	assignment.Tags = annotation.Tags
+	annotation.Reviewed = true
+	annotation.ReviewUserID = ReviewUserID.(int)
 	db.Save(assignment)
-	db.Save(annotaton)
+	db.Save(annotation)
 	response.Success(c, nil, "审核通过完成")
 }
 
