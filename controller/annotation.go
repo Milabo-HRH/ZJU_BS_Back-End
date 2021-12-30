@@ -110,20 +110,21 @@ func GetUnsolvedAnnotations(c *gin.Context) {
 
 func PublishTask(c *gin.Context) {
 	db := common.GetDB()
-	uploaderID, _ := c.Get("UploaderID")
-	FileName, _ := c.Get("FileName")
-	if !util.VerifyUploaderID(uploaderID.(int)) {
-		response.Response(c, http.StatusUnprocessableEntity, 500, nil, "该用户不存在")
+	user, exist := c.Get("user")
+	if !exist {
+		response.Response(c, http.StatusUnauthorized, 401, nil, "user not found")
 		return
 	}
+	uploaderID := user.(model.User).ID
+	FileName := c.PostForm("Filename")
 
-	var new = model.Assignment{
-		UploaderID: uploaderID.(int),
-		FileName:   FileName.(string),
+	var newTask = model.Assignment{
+		UploaderID: uploaderID,
+		FileName:   FileName, //filename includes "pics/"
 		Annotated:  false,
 		Reviewed:   false,
 	}
-	db.Create(new)
+	db.Create(&newTask)
 	response.Success(c, nil, "发布成功")
 }
 
@@ -132,10 +133,7 @@ func PublishAnnotation(c *gin.Context) {
 	UploaderID, _ := c.Get("UploaderID")
 	AssignmentID, _ := c.Get("AssignmentID")
 	Tags, _ := c.Get("Tags")
-	if !util.VerifyUploaderID(UploaderID.(int)) {
-		response.Response(c, http.StatusUnprocessableEntity, 500, nil, "该用户不存在")
-		return
-	}
+
 	assignment := model.Assignment{}
 	if err := db.Model(&model.Assignment{}).Where("id = ?", AssignmentID.(int)).Take(&assignment).Error; err != nil {
 		response.Response(c, http.StatusUnprocessableEntity, 500, nil, "该任务不存在")
@@ -143,13 +141,13 @@ func PublishAnnotation(c *gin.Context) {
 	}
 	assignment.Annotated = true
 	db.Save(assignment)
-	var new = model.Annotation{
-		UploaderID:   UploaderID.(int),
+	var newAnnotation = model.Annotation{
+		UploaderID:   UploaderID.(uint),
 		AssignmentID: AssignmentID.(int),
 		Tags:         Tags.(string),
 		Reviewed:     false,
 	}
-	db.Create(new)
+	db.Create(newAnnotation)
 
 	response.Success(c, nil, "标注完成")
 }

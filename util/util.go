@@ -25,11 +25,6 @@ func VerifyEmailFormat(email string) bool {
 	return reg.MatchString(email)
 }
 
-func VerifyUploaderID(ID int) bool {
-	return true
-	//todo: check if the ID is inside the DB and if the ID inside the token
-}
-
 func VerifyPictureID(ID int) bool {
 	return true
 	//todo: check if the picture is inside the DB
