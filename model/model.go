@@ -15,7 +15,7 @@ type User struct {
 type Assignment struct {
 	gorm.Model
 	UploaderID uint   `gorm:"type:int unsigned;notnull"`
-	FileName   string `gorm:"type:varchar(40);notnull"`
+	Filename   string `gorm:"type:varchar(100);notnull"`
 	Annotated  bool   `gorm:"type:bool"`
 	Reviewed   bool   `gorm:"type:bool"`
 	Tags       string `gorm:"type:varchar(40);"`
@@ -24,7 +24,7 @@ type Assignment struct {
 type Annotation struct {
 	gorm.Model
 	UploaderID   uint   `gorm:"type:int unsigned;notnull"`
-	AssignmentID int    `gorm:"type:int unsigned;notnull"`
+	AssignmentID uint   `gorm:"type:int unsigned;notnull"`
 	Tags         string `gorm:"type:varchar(40);"`
 	Reviewed     bool   `gorm:"type:bool"`
 	ReviewUserID int    `gorm:"type:int unsigned;notnull"`

@@ -22,12 +22,10 @@ func GetTasks(c *gin.Context) {
 	var res []gin.H
 	for i := 0; i < len(tasks); i++ {
 		res = append(res, gin.H{
-			"id":         tasks[i].ID,
-			"UploaderID": tasks[i].UploaderID,
-			"FileName":   tasks[i].FileName,
-			"Tags":       tasks[i].Tags,
-			"Reviewed":   tasks[i].Reviewed,
-			"Annotated":  tasks[i].Annotated,
+			"id":        tasks[i].ID,
+			"Uploader":  util.GetUsername(db, tasks[i].UploaderID),
+			"PublishAt": tasks[i].CreatedAt.Format("2006-01-02 15:04:05"),
+			"Filename":  tasks[i].Filename,
 		})
 	}
 	response.Success(c, gin.H{"data": res}, "所有任务")
@@ -45,12 +43,13 @@ func GetUnsolvedTasks(c *gin.Context) {
 	var res []gin.H
 	for i := 0; i < len(tasks); i++ {
 		res = append(res, gin.H{
-			"id":       tasks[i].ID,
-			"FileName": tasks[i].FileName,
+			"id":        tasks[i].ID,
+			"Uploader":  util.GetUsername(db, tasks[i].UploaderID),
+			"PublishAt": tasks[i].CreatedAt.Format("2006-01-02 15:04:05"),
+			"Filename":  tasks[i].Filename,
 		})
 	}
 	response.Success(c, gin.H{"data": res}, "未标注任务")
-
 }
 
 func GetAnnotations(c *gin.Context) {
@@ -86,7 +85,7 @@ func GetUnsolvedAnnotations(c *gin.Context) {
 	var res []gin.H
 	for i := 0; i < len(tasks); i++ {
 		var FileName string
-		if err := db.Model(&model.Assignment{}).Select("FileName").Where("id = ?", tasks[i].AssignmentID).Order("id desc").First(&FileName).Error; err != nil {
+		if err := db.Model(&model.Assignment{}).Select("Filename").Where("id = ?", tasks[i].AssignmentID).Order("id desc").First(&FileName).Error; err != nil {
 			response.Response(c, http.StatusUnprocessableEntity, 500, nil, "查询失败")
 			return
 		}
@@ -102,7 +101,7 @@ func GetUnsolvedAnnotations(c *gin.Context) {
 			"Tags":         tasks[i].Tags,
 			"Reviewed":     tasks[i].Reviewed,
 			"ReviewUserID": tasks[i].ReviewUserID,
-			"FileName":     FileName,
+			"Filename":     FileName,
 		})
 	}
 	response.Success(c, gin.H{"data": res}, "所有标注")
@@ -120,7 +119,7 @@ func PublishTask(c *gin.Context) {
 
 	var newTask = model.Assignment{
 		UploaderID: uploaderID,
-		FileName:   FileName, //filename includes "pics/"
+		Filename:   FileName, //filename includes "pics/"
 		Annotated:  false,
 		Reviewed:   false,
 	}
@@ -130,24 +129,33 @@ func PublishTask(c *gin.Context) {
 
 func PublishAnnotation(c *gin.Context) {
 	db := common.GetDB()
-	UploaderID, _ := c.Get("UploaderID")
-	AssignmentID, _ := c.Get("AssignmentID")
-	Tags, _ := c.Get("Tags")
 
+	user, exist := c.Get("user")
+	if !exist {
+		response.Response(c, http.StatusUnauthorized, 401, nil, "user not found")
+		return
+	}
+	UploaderID := user.(model.User).ID
+	AssignmentID := c.PostForm("AssignmentID")
+	Tags := c.PostForm("Tags")
+	if Tags == "" {
+		response.Response(c, http.StatusUnprocessableEntity, 400, nil, "标注不能为空")
+		return
+	}
 	assignment := model.Assignment{}
-	if err := db.Model(&model.Assignment{}).Where("id = ?", AssignmentID.(int)).Take(&assignment).Error; err != nil {
-		response.Response(c, http.StatusUnprocessableEntity, 500, nil, "该任务不存在")
+	if err := db.Model(&model.Assignment{}).Where("id = " + AssignmentID).Take(&assignment).Error; err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 400, nil, "该任务不存在")
 		return
 	}
 	assignment.Annotated = true
-	db.Save(assignment)
+	db.Save(&assignment)
 	var newAnnotation = model.Annotation{
-		UploaderID:   UploaderID.(uint),
-		AssignmentID: AssignmentID.(int),
-		Tags:         Tags.(string),
+		UploaderID:   UploaderID,
+		AssignmentID: assignment.ID,
+		Tags:         Tags,
 		Reviewed:     false,
 	}
-	db.Create(newAnnotation)
+	db.Create(&newAnnotation)
 
 	response.Success(c, nil, "标注完成")
 }
@@ -192,8 +200,8 @@ func PassAnnotation(c *gin.Context) {
 	assignment.Tags = annotation.Tags
 	annotation.Reviewed = true
 	annotation.ReviewUserID = ReviewUserID.(int)
-	db.Save(assignment)
-	db.Save(annotation)
+	db.Save(&assignment)
+	db.Save(&annotation)
 	response.Success(c, nil, "审核通过完成")
 }
 

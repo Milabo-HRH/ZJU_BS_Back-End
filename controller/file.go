@@ -4,6 +4,7 @@ import (
 	"ZJU_BS_Back-End/model"
 	"ZJU_BS_Back-End/response"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"net/http"
 	"regexp"
 )
@@ -22,24 +23,23 @@ func FileUpload(c *gin.Context) {
 		return
 	}
 	// check filename
-	ptn := `^[a-zA-Z0-9_-]{1,12}(.jpg|.png|.bmp)$`
+	ptn := `^[a-zA-Z0-9_-]{1,12}(.jpg|.png)$`
 	reg := regexp.MustCompile(ptn)
 	valid := reg.MatchString(filename)
 	if !valid {
 		response.Response(c, http.StatusBadRequest, 400, nil, "invalid filename")
 		return
 	}
-
 	// save to local directory
-
-	dst := "pics/" + filename
+	uid := uuid.New()
+	dst := "pics/" + uid.String() + filename[len(filename)-4:]
 	err = c.SaveUploadedFile(file, dst)
 	if err != nil {
 		response.Response(c, http.StatusBadRequest, 400, nil, "upload failed")
 		return
 	}
 	response.Success(c, gin.H{
-		"url": "pics/" + filename,
+		"url": dst,
 	}, "成功")
 }
 

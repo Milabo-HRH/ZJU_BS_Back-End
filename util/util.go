@@ -1,6 +1,8 @@
 package util
 
 import (
+	"ZJU_BS_Back-End/model"
+	"github.com/jinzhu/gorm"
 	"math/rand"
 	"regexp"
 	"time"
@@ -43,4 +45,10 @@ func VerifyAssignmentID(ID int) bool {
 func VerifyAnnotationID(ID int) bool {
 	return true
 	//todo: check if the annotationID is in the DB
+}
+
+func GetUsername(db *gorm.DB, id uint) string {
+	var user model.User
+	db.Where("id = ?", id).First(&user)
+	return user.Name
 }

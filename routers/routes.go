@@ -18,6 +18,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/pics/:filename", middleware.AuthPrivilege("guest"), controller.GetPicture)
 
 	r.GET("/tasks", middleware.AuthPrivilege("guest"), controller.GetTasks)
+	r.GET("/tasks/unsolved", middleware.AuthPrivilege("guest"), controller.GetUnsolvedTasks)
 	r.GET("/annotations", middleware.AuthPrivilege("guest"), controller.GetAnnotations)
 	r.POST("/tasks/publish", middleware.AuthMiddleware, middleware.AuthPrivilege("normal"), controller.PublishTask)
 	r.POST("/annotations/publish", middleware.AuthMiddleware, middleware.AuthPrivilege("normal"), controller.PublishAnnotation)
