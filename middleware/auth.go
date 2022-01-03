@@ -8,10 +8,6 @@ import (
 	"net/http"
 )
 
-type form struct {
-	Authorization string
-}
-
 func AuthMiddleware(ctx *gin.Context) {
 
 	// 获取 authorization header

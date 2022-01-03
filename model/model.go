@@ -27,5 +27,5 @@ type Annotation struct {
 	AssignmentID uint   `gorm:"type:int unsigned;notnull"`
 	Tags         string `gorm:"type:varchar(40);"`
 	Reviewed     bool   `gorm:"type:bool"`
-	ReviewUserID int    `gorm:"type:int unsigned;notnull"`
+	ReviewUserID uint   `gorm:"type:int unsigned;notnull"`
 }
