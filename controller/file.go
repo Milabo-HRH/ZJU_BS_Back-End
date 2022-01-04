@@ -22,17 +22,17 @@ func FileUpload(c *gin.Context) {
 		response.Response(c, http.StatusBadRequest, 400, nil, "upload failed")
 		return
 	}
-	// check filename
-	ptn := `^[a-zA-Z0-9_-]{1,12}(.jpg|.png)$`
+	//check filename
+	ptn := `^[a-zA-Z0-9_-]{1,99}(.jpg|.png)$`
 	reg := regexp.MustCompile(ptn)
 	valid := reg.MatchString(filename)
 	if !valid {
 		response.Response(c, http.StatusBadRequest, 400, nil, "invalid filename")
 		return
 	}
-	// save to local directory
+	//save to local directory
 	uid := uuid.New()
-	dst := "pics/" + uid.String() + filename[len(filename)-4:]
+	dst := "pics\\" + uid.String() + filename[len(filename)-4:]
 	err = c.SaveUploadedFile(file, dst)
 	if err != nil {
 		response.Response(c, http.StatusBadRequest, 400, nil, "upload failed")
